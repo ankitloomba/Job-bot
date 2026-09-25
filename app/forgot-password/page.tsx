@@ -1,1 +1,3 @@
-
+"use client";
+import { useState } from "react";
+export default function ForgotPassword(){const[email,setEmail]=useState("");const[sent,setSent]=useState(false);return <main className="auth-shell"><section className="auth-card"><div className="brand">JobFit<span>Pro</span></div><h1>Reset your password</h1><p className="sub">We’ll send a reset link to your email.</p><form onSubmit={e=>{e.preventDefault();setSent(true)}}><label>Email<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" /></label><button className="primary">Send reset link</button></form>{sent&&<div className="success">If an account exists for that email, reset instructions will be sent.</div>}<a className="forgot" href="/login">Back to login</a></section></main>}
