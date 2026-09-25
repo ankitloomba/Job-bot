@@ -1,1 +1,4 @@
-
+import { redirect } from "next/navigation";
+import { getAuthSession } from "@/lib/auth";
+import SignOut from "@/components/sign-out";
+export default async function Dashboard(){const s=await getAuthSession();if(!s)redirect("/login");return <main className="dashboard"><div className="top"><div className="brand">JobFit<span>Pro</span></div><SignOut/></div><section className="welcome"><p className="eyebrow">YOU’RE IN</p><h1>Welcome{ s.user?.name ? `, ${s.user.name}` : ""}.</h1><p>Your account is ready. Next we’ll connect your job sources and build your personalized job feed.</p></section><div className="next-grid"><div><b>01</b><h3>Connect accounts</h3><p>Link the job platforms you use.</p></div><div><b>02</b><h3>Build your profile</h3><p>Add your resume and preferences.</p></div><div><b>03</b><h3>Find your matches</h3><p>See fit scores and apply on the original job site.</p></div></div></main>}
