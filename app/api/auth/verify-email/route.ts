@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -6,36 +8,25 @@ export async function GET(req: Request) {
     const requestUrl = new URL(req.url);
     const token = requestUrl.searchParams.get("token");
 
-    // No token
     if (!token) {
       return NextResponse.redirect(
         new URL("/login?verified=invalid", req.url)
       );
     }
 
-    // Find verification token
     const record = await prisma.verificationToken.findUnique({
-      where: {
-        token,
-      },
+      where: { token },
     });
 
-    // Token does not exist
     if (!record) {
       return NextResponse.redirect(
         new URL("/login?verified=invalid", req.url)
       );
     }
 
-    // Token has expired
     if (record.expires < new Date()) {
-      // Remove expired token
       await prisma.verificationToken
-        .delete({
-          where: {
-            token,
-          },
-        })
+        .delete({ where: { token } })
         .catch(() => {});
 
       return NextResponse.redirect(
@@ -43,20 +34,13 @@ export async function GET(req: Request) {
       );
     }
 
-    // Find the user associated with the token
     const user = await prisma.user.findUnique({
-      where: {
-        email: record.identifier,
-      },
+      where: { email: record.identifier },
     });
 
     if (!user) {
       await prisma.verificationToken
-        .delete({
-          where: {
-            token,
-          },
-        })
+        .delete({ where: { token } })
         .catch(() => {});
 
       return NextResponse.redirect(
@@ -64,29 +48,17 @@ export async function GET(req: Request) {
       );
     }
 
-    // Mark email as verified
     await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        emailVerified: new Date(),
-      },
+      where: { id: user.id },
+      data: { emailVerified: new Date() },
     });
 
-    // Token is one-time use
     await prisma.verificationToken.delete({
-      where: {
-        token,
-      },
+      where: { token },
     });
 
-    // Send user to login, with setup-account as the next step
     return NextResponse.redirect(
-      new URL(
-        "/login?verified=success&next=/setup-account",
-        req.url
-      )
+      new URL("/login?verified=success&next=/setup-account", req.url)
     );
   } catch (error) {
     console.error("Email verification error:", error);
