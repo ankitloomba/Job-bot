@@ -5,29 +5,87 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+const LinkedInProvider = {
+  id: "linkedin",
+  name: "LinkedIn",
+  type: "oauth" as const,
+  clientId: process.env.LINKEDIN_CLIENT_ID!,
+  clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
+  wellKnown: "https://www.linkedin.com/oauth/.well-known/openid-configuration",
+  issuer: "https://www.linkedin.com",
+  idToken: true,
+  authorization: {
+    params: {
+      scope: "openid profile email",
+    },
+  },
+  client: {
+    token_endpoint_auth_method: "client_secret_post",
+  },
+  profile(profile: any) {
+    return {
+      id: profile.sub,
+      name:
+        profile.name ??
+        [profile.given_name, profile.family_name].filter(Boolean).join(" ") ||
+        null,
+      email: profile.email ?? null,
+      image: profile.picture ?? null,
+    };
+  },
+};
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   providers: [
-    GoogleProvider({ clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET! }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    LinkedInProvider,
     CredentialsProvider({
       name: "Email and password",
-      credentials: { email: { label: "Email", type: "email" }, password: { label: "Password", type: "password" } },
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) return null;
-        const user = await prisma.user.findUnique({ where: { email: credentials.email.toLowerCase().trim() } });
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email.toLowerCase().trim() },
+        });
         if (!user?.passwordHash || !user.emailVerified) return null;
         const valid = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!valid) return null;
-        return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
-      }
-    })
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+          role: user.role,
+        };
+      },
+    }),
   ],
   callbacks: {
-    async jwt({ token, user }) { if (user) { token.id = user.id; token.role = (user as any).role; } return token; },
-    async session({ session, token }) { if (session.user) { (session.user as any).id = token.id; (session.user as any).role = token.role; } return session; }
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = (user as any).role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        (session.user as any).id = token.id;
+        (session.user as any).role = token.role;
+      }
+      return session;
+    },
   },
   pages: { signIn: "/login" },
-  secret: process.env.NEXTAUTH_SECRET
+  secret: process.env.NEXTAUTH_SECRET,
 };
+
 export const getAuthSession = () => getServerSession(authOptions);
