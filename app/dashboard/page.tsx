@@ -19,7 +19,7 @@ export default async function Dashboard() {
     <main className="dashboard-shell">
       <header className="dashboard-top">
         <div className="dashboard-wrap" style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <Link href="/" className="brand" style={{textDecoration:"none"}}><span className="brand-mark"/>JOBHUNT<span>PRO</span></Link>
+          <Link href="/" className="brand" style={{textDecoration:"none"}}><img src="/logo-primary.svg" alt="JobHuntPro" className="brand-logo" /></Link>
           <div style={{display:"flex",alignItems:"center",gap:14}}>
             <span style={{fontSize:13,color:"#756e88"}}>{s.user?.name || s.user?.email}</span>
             <SignOut/>
