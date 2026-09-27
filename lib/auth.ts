@@ -27,8 +27,7 @@ const LinkedInProvider = {
       id: profile.sub,
       name:
         profile.name ??
-        [profile.given_name, profile.family_name].filter(Boolean).join(" ") ||
-        null,
+        ([profile.given_name, profile.family_name].filter(Boolean).join(" ") || null),
       email: profile.email ?? null,
       image: profile.picture ?? null,
     };
