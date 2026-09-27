@@ -23,7 +23,7 @@ export default function LoginPage() {
   return (
     <main className="auth-shell">
       <section className="auth-card">
-        <div className="brand">JOBHUNT<span>PRO</span></div>
+        <img src="/logo-primary.svg" alt="JobHuntPro" className="auth-logo" />
         <h1>Welcome back</h1>
         <p className="sub">Find the right jobs. Faster.</p>
 
