@@ -1,11 +1,11 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { getServerSession, type NextAuthOptions } from "next-auth";
+import { getServerSession, type NextAuthOptions, type OAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-const LinkedInProvider = {
+const LinkedInProvider: OAuthConfig<any> = {
   id: "linkedin",
   name: "LinkedIn",
   type: "oauth" as const,
