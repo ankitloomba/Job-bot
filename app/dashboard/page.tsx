@@ -18,6 +18,7 @@ const activity = [
 export default async function Dashboard() {
   const s = await getAuthSession();
   if (!s) redirect("/login");
+  if (!(s.user as any)?.profileComplete) redirect("/setup-account");
   const firstName = s.user?.name?.split(" ")[0] || "there";
 
   return (
