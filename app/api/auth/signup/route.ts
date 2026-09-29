@@ -263,7 +263,6 @@ export async function POST(req: Request) {
         city: cleanCity,
         state: cleanState,
         location: [cleanCity, cleanState].filter(Boolean).join(", "),
-        profileComplete: true,
         passwordHash,
       },
     });
