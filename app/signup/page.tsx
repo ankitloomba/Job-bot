@@ -109,7 +109,7 @@ export default function SignupPage() {
     setErrors((e) => ({ ...e, pinCode: "", city: "", state: "" }));
 
     try {
-      const response = await fetch(\`https://api.postalpincode.in/pincode/\${pin}\`);
+      const response = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
       const data = await response.json();
       const offices = data?.[0]?.PostOffice;
 
@@ -264,7 +264,7 @@ export default function SignupPage() {
             <label>Password
               <input type="password" value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="Create a strong password" autoComplete="new-password" aria-invalid={!!errors.password} />
               {form.password && <div className="password-strength" aria-live="polite">
-                <div className="strength-bars">{[0,1,2,3,4].map((i) => <span key={i} className={i < strength.score ? \`filled strength-\${strength.score}\` : ""} />)}</div>
+                <div className="strength-bars">{[0,1,2,3,4].map((i) => <span key={i} className={i < strength.score ? `filled strength-${strength.score}` : ""} />)}</div>
                 <div className="strength-row"><span>{strength.label} password</span><span>{strength.score}/5</span></div>
                 <div className="password-rules">
                   <span className={checks.length ? "valid" : ""}>✓ 8+ chars</span>
