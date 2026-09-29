@@ -63,6 +63,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           image: user.image,
           role: user.role,
+          profileComplete: user.profileComplete,
         };
       },
     }),
@@ -72,13 +73,23 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         (token as any).id = user.id;
         (token as any).role = (user as any).role;
+        (token as any).profileComplete = (user as any).profileComplete;
       }
       return token;
+    },
+    async signIn({ user, account }) {
+      if (account?.provider === "google" || account?.provider === "linkedin") {
+        const dbUser = user.id ? await prisma.user.findUnique({ where: { id: user.id } }) : null;
+        if (dbUser && !dbUser.profileComplete) return "/complete-profile";
+      }
+      return true;
     },
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).id = (token as any).id;
         (session.user as any).role = (token as any).role;
+        const dbUser = (token as any).id ? await prisma.user.findUnique({ where: { id: (token as any).id } }) : null;
+        (session.user as any).profileComplete = dbUser?.profileComplete ?? (token as any).profileComplete ?? false;
       }
       return session;
     },
