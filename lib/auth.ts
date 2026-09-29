@@ -80,7 +80,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === "google" || account?.provider === "linkedin") {
         const dbUser = user.id ? await prisma.user.findUnique({ where: { id: user.id } }) : null;
-        if (dbUser && !dbUser.profileComplete) return "/complete-profile";
+        if (dbUser && !dbUser.profileComplete) return "/setup-account";
       }
       return true;
     },
