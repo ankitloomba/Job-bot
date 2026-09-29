@@ -219,7 +219,7 @@ export default function SignupPage() {
           <label>Phone number
             <div className="phone-input">
               <div className="country-code">
-                <span>🇮🇳</span>
+                <span>{countries.find(([, code]) => code === form.countryCode)?.[0] || "🌐"}</span>
                 <select value={form.countryCode} onChange={(e) => update("countryCode", e.target.value)} aria-label="Country code">
                   {countries.map(([flag, code, country]) => <option key={country + code} value={code}>{flag} {code}</option>)}
                 </select>
