@@ -82,3 +82,8 @@ body{overflow-x:hidden}button,input{font:inherit}a{color:inherit}
   .password-rules{gap:5px 8px}
   .signup-social-grid .social-login{height:46px}
 }
+
+.social-login-branded{display:flex!important;align-items:center;justify-content:center;gap:9px}
+.social-icon{width:18px;height:18px;flex:0 0 18px}
+.linkedin-icon{width:18px;height:18px;border-radius:3px;background:#0a66c2;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:900;line-height:1}
+.social-buttons .social-login-branded{margin-top:10px}
