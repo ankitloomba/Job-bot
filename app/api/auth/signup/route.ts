@@ -108,7 +108,13 @@ export async function POST(req: Request) {
     const {
       name,
       email,
+      countryCode,
       phone,
+      address1,
+      address2,
+      pinCode,
+      city,
+      state,
       password,
       confirmPassword,
     } = await req.json();
@@ -118,13 +124,23 @@ export async function POST(req: Request) {
       .toLowerCase();
 
     const cleanName = String(name ?? "").trim();
-    const cleanPhone = String(phone ?? "").trim();
+    const cleanCountryCode = String(countryCode ?? "+91").trim();
+    const cleanPhone = String(phone ?? "").replace(/\D/g, "").trim();
+    const cleanAddress1 = String(address1 ?? "").trim();
+    const cleanAddress2 = String(address2 ?? "").trim();
+    const cleanPinCode = String(pinCode ?? "").replace(/\D/g, "").trim();
+    const cleanCity = String(city ?? "").trim();
+    const cleanState = String(state ?? "").trim();
 
     // Required fields
     if (
       !cleanName ||
       !normalized ||
       !cleanPhone ||
+      !cleanAddress1 ||
+      !cleanPinCode ||
+      !cleanCity ||
+      !cleanState ||
       !password ||
       !confirmPassword
     ) {
@@ -134,6 +150,26 @@ export async function POST(req: Request) {
         },
         { status: 400 }
       );
+    }
+
+    // Name validation
+    if (!/^[A-Za-zÀ-ÿ' .-]+$/.test(cleanName) || cleanName.length < 2) {
+      return NextResponse.json({ error: "Enter a valid full name." }, { status: 400 });
+    }
+
+    // Phone validation
+    if (!/^\d{7,15}$/.test(cleanPhone)) {
+      return NextResponse.json({ error: "Enter a valid phone number." }, { status: 400 });
+    }
+
+    // Address validation
+    if (cleanAddress1.length < 3) {
+      return NextResponse.json({ error: "Enter a valid address." }, { status: 400 });
+    }
+
+    // PIN validation
+    if (!/^\d{6}$/.test(cleanPinCode)) {
+      return NextResponse.json({ error: "Enter a valid 6-digit PIN code." }, { status: 400 });
     }
 
     // Email validation
@@ -147,7 +183,15 @@ export async function POST(req: Request) {
     }
 
     // Password validation
-    if (String(password).length < 8) {
+    const passwordValue = String(password);
+    const passwordScore = [
+      passwordValue.length >= 8,
+      /[A-Z]/.test(passwordValue),
+      /[a-z]/.test(passwordValue),
+      /\d/.test(passwordValue),
+      /[^A-Za-z0-9]/.test(passwordValue),
+    ].filter(Boolean).length;
+    if (passwordScore < 4) {
       return NextResponse.json(
         {
           error: "Password must be at least 8 characters.",
@@ -212,6 +256,13 @@ export async function POST(req: Request) {
         email: normalized,
         name: cleanName,
         phone: cleanPhone,
+        countryCode: cleanCountryCode,
+        address1: cleanAddress1,
+        address2: cleanAddress2 || null,
+        pinCode: cleanPinCode,
+        city: cleanCity,
+        state: cleanState,
+        location: [cleanCity, cleanState].filter(Boolean).join(", "),
         passwordHash,
       },
     });
