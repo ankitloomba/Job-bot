@@ -19,6 +19,12 @@ model User {
   emailVerified   DateTime?
   image           String?
   phone           String?       @unique
+  countryCode     String?
+  address1        String?
+  address2        String?
+  pinCode         String?
+  city            String?
+  state           String?
   passwordHash    String?
   role            Role          @default(MEMBER)
   profileComplete Boolean       @default(false)
